@@ -38,6 +38,47 @@ if (isset($_POST['agregar_carrito'])) {
     }
 }
 ?>
+<?php
+session_start(); // Esto debe ir al inicio del archivo
+
+// Inicializar el carrito si no existe
+if (!isset($_SESSION['carrito'])) {
+    $_SESSION['carrito'] = [];
+}
+
+// Función para agregar productos al carrito
+if (isset($_POST['agregar_carrito'])) {
+    $producto = [
+        'nombre' => $_POST['nombre'],
+        'precio' => $_POST['precio'],
+        'stock' => $_POST['stock'],
+        'cantidad' => 1
+    ];
+
+    // Verificar si el producto ya está en el carrito
+    $encontrado = false;
+    foreach ($_SESSION['carrito'] as &$item) {
+        if ($item['nombre'] == $producto['nombre']) {
+            // Si el producto ya está en el carrito, verificar el stock disponible
+            if ($item['cantidad'] < $producto['stock']) {
+                $item['cantidad']++;
+                $encontrado = true;
+            } else {
+                echo "<script>alert('No hay suficiente stock disponible.');</script>";
+            }
+            break;
+        }
+    }
+
+    if (!$encontrado && $producto['stock'] > 0) {
+        // Agregar el nuevo producto al carrito si hay stock disponible
+        $_SESSION['carrito'][] = $producto;
+    } elseif ($producto['stock'] <= 0) {
+        echo "<script>alert('Este producto no tiene stock disponible.');</script>";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html>
 
